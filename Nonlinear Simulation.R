@@ -53,23 +53,19 @@ alpha0_A <- -0.6   # coefficients for Apple Juice
 alpha1_A <- 0.6
 alpha2_A <- 0.2
 alpha3_A <- 0.4
-alpha4_A <- 0.5
-beta0_A <- 1.2
+beta0_A <- 1
 beta1_A <- 0.5
 beta2_A <- 0.1
 beta3_A <- 0.2
-beta4_A <- 0.5
 
 alpha0_B <- -0.5   # coefficients for Berry Juice
 alpha1_B <- 0.6
 alpha2_B <- 0.3
 alpha3_B <- 0.3
-alpha4_B <- 0.5
-beta0_B <- 0.3
-beta1_B <- 0.2
+beta0_B <- 1
+beta1_B <- 0.5
 beta2_B <- 0.2
 beta3_B <- 0.1
-beta4_B <- 0.5
 
 data_juice <- data.frame(
   ApplePrice = x1_option1,
@@ -88,8 +84,8 @@ data_juice <- data.frame(
   BerryPackage = x7_option2
 )
 
-data_juice$V_Apple <- alpha0_A * beta0_A * x1_option1^(beta0_A-1) + alpha1_A * x2_option1^alpha2_A * x3_option1^alpha3_A * x4_option1 +  beta1_A * x2_option1^beta2_A * x3_option1^beta3_A * (1-x4_option1) 
-data_juice$V_Berry <- alpha0_B * beta0_B * x1_option2^(beta0_B-1) + alpha1_B * x2_option2^alpha2_B * x3_option2^alpha3_B * x4_option2 +  beta1_B * x2_option2^beta2_B * x3_option2^beta3_B * (1-x4_option2)
+data_juice$V_Apple <- alpha0_A * x1_option1^beta0_A + alpha1_A * x2_option1^alpha2_A * x3_option1^alpha3_A * x4_option1 +  beta1_A * x2_option1^beta2_A * x3_option1^beta3_A * (1-x4_option1) 
+data_juice$V_Berry <- alpha0_B * x1_option2^beta0_B + alpha1_B * x2_option2^alpha2_B * x3_option2^alpha3_B * x4_option2 +  beta1_B * x2_option2^beta2_B * x3_option2^beta3_B * (1-x4_option2)
 data_juice$e_Apple <- rlogis(nrow(data_juice), location = 0, scale = 3)
 data_juice$e_Berry <- rlogis(nrow(data_juice), location = 0, scale = 3)
 data_juice$U_Apple <- data_juice$V_Apple + data_juice$e_Apple         # U_Apple = V_Apple + e_Apple
@@ -134,7 +130,7 @@ ggplot(data_juice_plot, aes(x = U_Apple, y = U_Berry, colour = Choice)) +
 ############################## Nonlinear Marginal utility ##############################
 data_juice <- subset(data_juice, select = -c(V_Apple, e_Apple,U_Apple,V_Berry,e_Berry,U_Berry))
 # first-order derivative
-functionApple <- formula (y ~ alpha0_A * beta0_A * x1_option1^(beta0_A-1) + alpha1_A * x2_option1^alpha2_A * x3_option1^alpha3_A * x4_option1 +  beta1_A * x2_option1^beta2_A * x3_option1^beta3_A * (1-x4_option1) )
+functionApple <- formula (y ~ alpha0_A * x1_option1^beta0_A + alpha1_A * x2_option1^alpha2_A * x3_option1^alpha3_A * x4_option1 +  beta1_A * x2_option1^beta2_A * x3_option1^beta3_A * (1-x4_option1) )
 dfApplePrice <- deriv(functionApple,"x1_option1",function.arg = TRUE)
 betaApplePrice <- attr(dfApplePrice(x1_option1), "gradient")     # Marginal utility of Apple price 
 
@@ -150,7 +146,7 @@ dfAppleOrganic <- deriv(functionApple,"x4_option1",function.arg = TRUE)
 betaAppleOrganic <- attr(dfAppleOrganic(x4_option1),"gradient")     # Marginal utility of Apple Organic 
 0.6*x2_option1[1]^0.2*x3_option1[1]^0.4 - 0.5*x2_option1[1]^0.1*x3_option1[1]^0.2 # manual test 
 
-functionBerry <- formula (y ~ alpha0_B * x1_option2 + alpha1_B * x2_option2^alpha2_B * x3_option2^alpha3_B * x4_option2 +  beta1_B * x2_option2^beta2_B * x3_option2^beta3_B * (1-x4_option2) )
+functionBerry <- formula (y ~ alpha0_B * x1_option2^beta0_B + alpha1_B * x2_option2^alpha2_B * x3_option2^alpha3_B * x4_option2 +  beta1_B * x2_option2^beta2_B * x3_option2^beta3_B * (1-x4_option2) )
 dfBerryPrice <- deriv(functionBerry,"x1_option2",function.arg = TRUE)
 betaBerryPrice <- attr(dfBerryPrice(x1_option2),"gradient")            # Marginal utility of Berry price 
 
@@ -239,9 +235,9 @@ for (i in 1:ntree) {
   cat("\n")
 }
 
-# original rf
+# original RF
 tree_predictions <- predict(rf_model, test_data, predict.all = TRUE)
-print(tree_predictions$individual) 
+print(tree_predictions$individual)     # Query the selection of each tree for each observation 
 
 n_observations <- nrow(tree_predictions$individual)
 n_trees <- ncol(tree_predictions$individual)
@@ -325,7 +321,7 @@ derivative_AppleSize <- (result_AppleSize_modified$`Apple Juice` - result_df$`Ap
 
 # change of AppleOrganic
 AppleOrganic_modified <- test_data
-#AppleOrganic_modified$AppleOrganic[AppleOrganic_modified$AppleOrganic == 1] <- 0 ## ANOTHER METHOD: focus on the good which is no-organic at first,when it turns to organic, the change of purchase%  
+# AppleOrganic_modified$AppleOrganic[AppleOrganic_modified$AppleOrganic == 1] <- 0 ## ANOTHER METHOD: focus on the good which is no-organic at first,when it turns to organic, the change of purchase%  
 
 delta_AppleOrganic <- 0.1
 AppleOrganic_modified$AppleOrganic <- AppleOrganic_modified$AppleOrganic + delta_AppleOrganic
