@@ -186,7 +186,7 @@ sd_NOL_WTP_BerryOrganic <- sd(NOL_WTP_BerryOrganic)
 
 
 
-############################## Multinomial Logit Model ##############################
+############################## Multinominal Logit Model ##############################
 Apple_data <- data_juice %>%
   mutate(AppleChoice = ifelse(Choice == "Apple Juice",1,0)) %>%
   select(-BerryPrice,-BerryCalorie,-BerrySize,-BerryOrganic,-BerrySugar,-BerryRecall,-BerryPackage,-Choice) 
@@ -217,7 +217,7 @@ print(compare_mean)
 train_indices <- sample(seq_len(nrow(data_juice)), size = 0.5 * nrow(data_juice))
 train_data <- data_juice[train_indices, ]
 test_data <- data_juice[-train_indices, ]
-rf_model <- randomForest(as.factor(train_data$Choice) ~ ., importance = TRUE, data = train_data, ntree = 100)
+rf_model <- randomForest(as.factor(train_data$Choice) ~ ., importance = TRUE, data = train_data, ntree = 500)
 
 importance <- importance(rf_model)
 importance_df <- as.data.frame(importance)
@@ -277,7 +277,7 @@ for (i in 1:n_observations) {
 result_ApplePrice_modified <- as.data.frame(ApplePrice_matrix_modified)
 print(head(result_ApplePrice_modified))
 
-derivative_ApplePrice <- (result_ApplePrice_modified$`Apple Juice` - result_df$`Apple Juice` )/(delta_ApplePrice*100) 
+derivative_ApplePrice <- (result_ApplePrice_modified$`Apple Juice` - result_df$`Apple Juice` )/(delta_ApplePrice*500) 
 
 # change of AppleCalorie 
 AppleCalorie_modified <- test_data
@@ -297,7 +297,7 @@ for (i in 1:n_observations) {
 result_AppleCalorie_modified <- as.data.frame(AppleCalorie_matrix_modified)
 print(head(result_AppleCalorie_modified))
 
-derivative_AppleCalorie <- (result_AppleCalorie_modified$`Apple Juice` - result_df$`Apple Juice` )/(delta_AppleCalorie*100) 
+derivative_AppleCalorie <- (result_AppleCalorie_modified$`Apple Juice` - result_df$`Apple Juice` )/(delta_AppleCalorie*500) 
 
 # change of AppleSize 
 AppleSize_modified <- test_data
@@ -317,11 +317,11 @@ for (i in 1:n_observations) {
 result_AppleSize_modified <- as.data.frame(AppleSize_matrix_modified)
 print(head(result_AppleSize_modified))
 
-derivative_AppleSize <- (result_AppleSize_modified$`Apple Juice` - result_df$`Apple Juice` )/(delta_AppleSize*100) 
+derivative_AppleSize <- (result_AppleSize_modified$`Apple Juice` - result_df$`Apple Juice` )/(delta_AppleSize*500) 
 
 # change of AppleOrganic
 AppleOrganic_modified <- test_data
-# AppleOrganic_modified$AppleOrganic[AppleOrganic_modified$AppleOrganic == 1] <- 0 ## ANOTHER METHOD: focus on the good which is no-organic at first,when it turns to organic, the change of purchase%  
+AppleOrganic_modified$AppleOrganic[AppleOrganic_modified$AppleOrganic == 1] <- 0 ## ANOTHER METHOD: focus on the good which is no-organic at first,when it turns to organic, the change of purchase%  
 
 delta_AppleOrganic <- 0.1
 AppleOrganic_modified$AppleOrganic <- AppleOrganic_modified$AppleOrganic + delta_AppleOrganic
@@ -338,7 +338,7 @@ for (i in 1:n_observations) {
 result_AppleOrganic_modified <- as.data.frame(AppleOrganic_matrix_modified)
 print(head(result_AppleOrganic_modified))
 
-derivative_AppleOrganic <- (result_AppleOrganic_modified$`Apple Juice` - result_df$`Apple Juice` )/(delta_AppleOrganic*100) 
+derivative_AppleOrganic <- (result_AppleOrganic_modified$`Apple Juice` - result_df$`Apple Juice` )/(delta_AppleOrganic*500) 
 
 
 # change of BerryPrice 
@@ -359,7 +359,7 @@ for (i in 1:n_observations) {
 result_BerryPrice_modified <- as.data.frame(BerryPrice_matrix_modified)
 print(head(result_BerryPrice_modified))
 
-derivative_BerryPrice <- (result_BerryPrice_modified$`Berry Juice` - result_df$`Berry Juice` )/(delta_BerryPrice*100) 
+derivative_BerryPrice <- (result_BerryPrice_modified$`Berry Juice` - result_df$`Berry Juice` )/(delta_BerryPrice*500) 
 
 # change of BerryCalorie 
 BerryCalorie_modified <- test_data
@@ -379,7 +379,7 @@ for (i in 1:n_observations) {
 result_BerryCalorie_modified <- as.data.frame(BerryCalorie_matrix_modified)
 print(head(result_BerryCalorie_modified))
 
-derivative_BerryCalorie <- (result_BerryCalorie_modified$`Berry Juice` - result_df$`Berry Juice` )/(delta_BerryCalorie*100) 
+derivative_BerryCalorie <- (result_BerryCalorie_modified$`Berry Juice` - result_df$`Berry Juice` )/(delta_BerryCalorie*500) 
 
 # change of BerrySize 
 BerrySize_modified <- test_data
@@ -399,13 +399,13 @@ for (i in 1:n_observations) {
 result_BerrySize_modified <- as.data.frame(BerrySize_matrix_modified)
 print(head(result_BerrySize_modified))
 
-derivative_BerrySize <- (result_BerrySize_modified$`Berry Juice` - result_df$`Berry Juice` )/(delta_BerrySize*100) 
+derivative_BerrySize <- (result_BerrySize_modified$`Berry Juice` - result_df$`Berry Juice` )/(delta_BerrySize*500) 
 
 # change of BerryOrganic
 BerryOrganic_modified <- test_data
-#BerryOrganic_modified$BerryOrganic[BerryOrganic_modified$BerryOrganic == 1] <- 0
+BerryOrganic_modified$BerryOrganic[BerryOrganic_modified$BerryOrganic == 1] <- 0
 
-delta_BerryOrganic <- 0.1
+delta_BerryOrganic <- 1
 BerryOrganic_modified$BerryOrganic <- BerryOrganic_modified$BerryOrganic + delta_BerryOrganic
 BerryOrganic_predictions_modified <- predict(rf_model, BerryOrganic_modified, predict.all = TRUE)
 BerryOrganic_matrix_modified <- matrix(0, nrow = n_observations, ncol = length(categories))
@@ -420,7 +420,7 @@ for (i in 1:n_observations) {
 result_BerryOrganic_modified <- as.data.frame(BerryOrganic_matrix_modified)
 print(head(result_BerryOrganic_modified))
 
-derivative_BerryOrganic <- (result_BerryOrganic_modified$`Berry Juice` - result_df$`Berry Juice` )/(delta_BerryOrganic*100) 
+derivative_BerryOrganic <- (result_BerryOrganic_modified$`Berry Juice` - result_df$`Berry Juice` )/(delta_BerryOrganic*500) 
 
 # wtp 
 wtp_rf_AppleCalorie <- - derivative_AppleCalorie/derivative_ApplePrice
