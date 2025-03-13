@@ -57,7 +57,7 @@ alpha3_A <- 0.4
 beta1_A <- 0.5
 beta2_A <- 0.1
 beta3_A <- 0.2
-
+  
 alpha0_B <- -0.6  # coefficients for Berry Juice
 beta0_B <- 1
 alpha1_B <- 0.7
@@ -129,35 +129,212 @@ ggplot(data_juice_plot, aes(x = U_Apple, y = U_Berry, colour = Choice)) +
 
 ############################## Nonlinear Marginal utility ##############################
 data_juice <- subset(data_juice, select = -c(V_Apple, e_Apple,U_Apple,V_Berry,e_Berry,U_Berry))
+
 # first-order derivative
 functionApple <- formula (y ~ alpha0_A * x1_option1^beta0_A + alpha1_A * x2_option1^alpha2_A * x3_option1^alpha3_A * x4_option1 +  beta1_A * x2_option1^beta2_A * x3_option1^beta3_A * (1-x4_option1) )
-dfApplePrice <- deriv(functionApple,"x1_option1",function.arg = TRUE)
-betaApplePrice <- attr(dfApplePrice(x1_option1), "gradient")     # Marginal utility of Apple price 
+dfApplePrice <- deriv(functionApple,c("alpha0_A",
+                                      "x1_option1",
+                                      "beta0_A",
+                                      "alpha1_A",
+                                      "x2_option1",
+                                      "alpha2_A",
+                                      "x3_option1",
+                                      "alpha3_A",
+                                      "x4_option1",
+                                      "beta1_A",
+                                      "beta2_A",
+                                      "beta3_A"),function.arg = TRUE)
+betaApplePrice <- attr(dfApplePrice(alpha0_A,
+                                    x1_option1,
+                                    beta0_A,
+                                    alpha1_A,
+                                    x2_option1,
+                                    alpha2_A,
+                                    x3_option1,
+                                    alpha3_A,
+                                    x4_option1,
+                                    beta1_A,
+                                    beta2_A,
+                                    beta3_A), "gradient") [,2]    # Marginal utility of Apple price 
 
-dfAppleCalorie <- deriv(functionApple,"x2_option1",function.arg = TRUE)
-betaAppleCalorie <- attr(dfAppleCalorie(x2_option1), "gradient")   # Marginal utility of Apple Calorie
+dfAppleCalorie <- deriv(functionApple,c("alpha0_A",
+                                        "x1_option1",
+                                        "beta0_A",
+                                        "alpha1_A",
+                                        "x2_option1",
+                                        "alpha2_A",
+                                        "x3_option1",
+                                        "alpha3_A",
+                                        "x4_option1",
+                                        "beta1_A",
+                                        "beta2_A",
+                                        "beta3_A"),function.arg = TRUE)
+betaAppleCalorie <- attr(dfAppleCalorie(alpha0_A,
+                                        x1_option1,
+                                        beta0_A,
+                                        alpha1_A,
+                                        x2_option1,
+                                        alpha2_A,
+                                        x3_option1,
+                                        alpha3_A,
+                                        x4_option1,
+                                        beta1_A,
+                                        beta2_A,
+                                        beta3_A), "gradient")[,5]   # Marginal utility of Apple Calorie
 #0.6*0.2*x2_option1[1]^(-0.8)*x3_option1[1]^0.4*x4_option1[1]+0.5*0.1*x2_option1[1]^(-0.9)*x3_option1[1]^0.2*(1-x4_option1[1]) # manual test 
 
-dfAppleSize <- deriv(functionApple,"x3_option1",function.arg = TRUE)
-betaAppleSize <- attr(dfAppleSize(x3_option1),"gradient")          # Marginal utility of Apple Size
+dfAppleSize <- deriv(functionApple,c("alpha0_A",
+                                     "x1_option1",
+                                     "beta0_A",
+                                     "alpha1_A",
+                                     "x2_option1",
+                                     "alpha2_A",
+                                     "x3_option1",
+                                     "alpha3_A",
+                                     "x4_option1",
+                                     "beta1_A",
+                                     "beta2_A",
+                                     "beta3_A"),function.arg = TRUE)
+betaAppleSize <- attr(dfAppleSize(alpha0_A,
+                                  x1_option1,
+                                  beta0_A,
+                                  alpha1_A,
+                                  x2_option1,
+                                  alpha2_A,
+                                  x3_option1,
+                                  alpha3_A,
+                                  x4_option1,
+                                  beta1_A,
+                                  beta2_A,
+                                  beta3_A),"gradient") [,7]         # Marginal utility of Apple Size
 #0.6*x2_option1[1]^0.2*0.4*x3_option1[1]^(-0.6)*x4_option1[1]+0.5*x2_option1[1]^0.1*0.2*x3_option1[1]^(-0.8)*(1-x4_option1[1]) # manual test
 
-dfAppleOrganic <- deriv(functionApple,"x4_option1",function.arg = TRUE)
-betaAppleOrganic <- attr(dfAppleOrganic(x4_option1),"gradient")     # Marginal utility of Apple Organic 
+dfAppleOrganic <- deriv(functionApple,c("alpha0_A",
+                                        "x1_option1",
+                                        "beta0_A",
+                                        "alpha1_A",
+                                        "x2_option1",
+                                        "alpha2_A",
+                                        "x3_option1",
+                                        "alpha3_A",
+                                        "x4_option1",
+                                        "beta1_A",
+                                        "beta2_A",
+                                        "beta3_A"),function.arg = TRUE)
+betaAppleOrganic <- attr(dfAppleOrganic(alpha0_A,
+                                        x1_option1,
+                                        beta0_A,
+                                        alpha1_A,
+                                        x2_option1,
+                                        alpha2_A,
+                                        x3_option1,
+                                        alpha3_A,
+                                        x4_option1,
+                                        beta1_A,
+                                        beta2_A,
+                                        beta3_A),"gradient") [,9]      # Marginal utility of Apple Organic 
 #0.6*x2_option1[1]^0.2*x3_option1[1]^0.4 - 0.5*x2_option1[1]^0.1*x3_option1[1]^0.2 # manual test 
 
 functionBerry <- formula (y ~ alpha0_B * x1_option2^beta0_B + alpha1_B * x2_option2^alpha2_B * x3_option2^alpha3_B * x4_option2 +  beta1_B * x2_option2^beta2_B * x3_option2^beta3_B * (1-x4_option2) )
-dfBerryPrice <- deriv(functionBerry,"x1_option2",function.arg = TRUE)
-betaBerryPrice <- attr(dfBerryPrice(x1_option2),"gradient")            # Marginal utility of Berry price 
+dfBerryPrice <- deriv(functionBerry,c("alpha0_B",
+                                      "x1_option2",
+                                      "beta0_B",
+                                      "alpha1_B",
+                                      "x2_option2",
+                                      "alpha2_B",
+                                      "x3_option2",
+                                      "alpha3_B",
+                                      "x4_option2",
+                                      "beta1_B",
+                                      "beta2_B",
+                                      "beta3_B"),function.arg = TRUE)
+betaBerryPrice <- attr(dfBerryPrice(alpha0_B,
+                                    x1_option2,
+                                    beta0_B,
+                                    alpha1_B,
+                                    x2_option2,
+                                    alpha2_B,
+                                    x3_option2,
+                                    alpha3_B,
+                                    x4_option2,
+                                    beta1_B,
+                                    beta2_B,
+                                    beta3_B),"gradient") [,2]          # Marginal utility of Berry price 
 
-dfBerryCalorie <- deriv(functionBerry,"x2_option2",function.arg = TRUE)
-betaBerryCalorie <- attr(dfBerryCalorie(x2_option2),"gradient")          # Marginal utility of Berry Calorie
+dfBerryCalorie <- deriv(functionBerry,c("alpha0_B",
+                                        "x1_option2",
+                                        "beta0_B",
+                                        "alpha1_B",
+                                        "x2_option2",
+                                        "alpha2_B",
+                                        "x3_option2",
+                                        "alpha3_B",
+                                        "x4_option2",
+                                        "beta1_B",
+                                        "beta2_B",
+                                        "beta3_B"),function.arg = TRUE)
+betaBerryCalorie <- attr(dfBerryCalorie(alpha0_B,
+                                        x1_option2,
+                                        beta0_B,
+                                        alpha1_B,
+                                        x2_option2,
+                                        alpha2_B,
+                                        x3_option2,
+                                        alpha3_B,
+                                        x4_option2,
+                                        beta1_B,
+                                        beta2_B,
+                                        beta3_B),"gradient") [,5]            # Marginal utility of Berry Calorie
 
-dfBerrySize <- deriv(functionBerry,"x3_option2",function.arg = TRUE)
-betaBerrySize <- attr(dfBerrySize(x3_option2),"gradient")            # Marginal utility of Berry Size
+dfBerrySize <- deriv(functionBerry,c("alpha0_B",
+                                     "x1_option2",
+                                     "beta0_B",
+                                     "alpha1_B",
+                                     "x2_option2",
+                                     "alpha2_B",
+                                     "x3_option2",
+                                     "alpha3_B",
+                                     "x4_option2",
+                                     "beta1_B",
+                                     "beta2_B",
+                                     "beta3_B"),function.arg = TRUE)
+betaBerrySize <- attr(dfBerrySize(alpha0_B,
+                                  x1_option2,
+                                  beta0_B,
+                                  alpha1_B,
+                                  x2_option2,
+                                  alpha2_B,
+                                  x3_option2,
+                                  alpha3_B,
+                                  x4_option2,
+                                  beta1_B,
+                                  beta2_B,
+                                  beta3_B),"gradient") [,7]             # Marginal utility of Berry Size
 
-dfBerryOrganic <- deriv(functionBerry,"x4_option2",function.arg = TRUE)
-betaBerryOrganic <- attr(dfBerryOrganic(x4_option2),"gradient")          # Marginal utility of Berry Organic
+dfBerryOrganic <- deriv(functionBerry,c("alpha0_B",
+                                        "x1_option2",
+                                        "beta0_B",
+                                        "alpha1_B",
+                                        "x2_option2",
+                                        "alpha2_B",
+                                        "x3_option2",
+                                        "alpha3_B",
+                                        "x4_option2",
+                                        "beta1_B",
+                                        "beta2_B",
+                                        "beta3_B"),function.arg = TRUE)
+betaBerryOrganic <- attr(dfBerryOrganic(alpha0_B,
+                                        x1_option2,
+                                        beta0_B,
+                                        alpha1_B,
+                                        x2_option2,
+                                        alpha2_B,
+                                        x3_option2,
+                                        alpha3_B,
+                                        x4_option2,
+                                        beta1_B,
+                                        beta2_B,
+                                        beta3_B),"gradient") [,9]            # Marginal utility of Berry Organic
 
 
 # Nonlinear Willingness to pay 
@@ -205,11 +382,11 @@ MNL_WTP_BerryCalorie <- -coef(MNL_Berry)["BerryCalorie"]/coef(MNL_Berry)["BerryP
 MNL_WTP_BerrySize <- -coef(MNL_Berry)["BerrySize"]/coef(MNL_Berry)["BerryPrice"]
 MNL_WTP_BerryOrganic <- -coef(MNL_Berry)["BerryOrganic"]/coef(MNL_Berry)["BerryPrice"]
 
-compare_mean <- data.frame(
+compare_mean_MNL <- data.frame(
   Nonlinear = c(mean_NOL_WTP_AppleCalorie, mean_NOL_WTP_AppleSize, mean_NOL_WTP_AppleOrganic, mean_NOL_WTP_BerryCalorie, mean_NOL_WTP_BerrySize, mean_NOL_WTP_BerryOrganic),
   MNL = c(MNL_WTP_AppleCalorie, MNL_WTP_AppleSize, MNL_WTP_AppleOrganic, MNL_WTP_BerryCalorie, MNL_WTP_BerrySize, MNL_WTP_BerryOrganic)
 )
-print(compare_mean)
+print(compare_mean_MNL)
 
 
 
@@ -235,6 +412,18 @@ for (i in 1:ntree) {
   print(getTree(rf_model, k = i, labelVar = TRUE))
   cat("\n")
 }
+
+# single decision tree
+install.packages("devtools")
+devtools::install_github("araastat/reprtree")
+library(reprtree)
+reprtree::plot.getTree(rf_model, k = 1)
+tree_1 <- getTree(rf_model, k = 1, labelVar = TRUE)
+
+library(rpart)
+rpart_tree <- as.party(rpart(Choice ~ ., data = test_data))  
+plot(rpart_tree)  
+
 
 # original RF
 tree_predictions <- predict(rf_model, test_data, predict.all = TRUE)
@@ -448,6 +637,5 @@ compare_mean <- data.frame(
   RandomForest = c(mean_rf_WTP_AppleCalorie,mean_rf_WTP_AppleSize,mean_rf_WTP_AppleOrganic,mean_rf_WTP_BerryCalorie,mean_rf_WTP_BerrySize,mean_rf_WTP_BerryOrganic)
 )
 print(compare_mean)
-
 
 
