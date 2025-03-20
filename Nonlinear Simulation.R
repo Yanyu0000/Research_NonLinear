@@ -1,4 +1,5 @@
 # Non linear Simulation 
+setwd("/Users/yanyuma/Documents/GitHub/Research_NonLinear")
 library(ggplot2)
 library(dplyr)
 library(patchwork)
@@ -84,8 +85,8 @@ data_juice <- data.frame(
   BerryPackage = x7_option2
 )
 
-data_juice$V_Apple <- alpha0_A * x1_option1^beta0_A + alpha1_A * x2_option1^alpha2_A * x3_option1^alpha3_A * x4_option1 +  beta1_A * x2_option1^beta2_A * x3_option1^beta3_A * (1-x4_option1) 
-data_juice$V_Berry <- alpha0_B * x1_option2^beta0_B + alpha1_B * x2_option2^alpha2_B * x3_option2^alpha3_B * x4_option2 +  beta1_B * x2_option2^beta2_B * x3_option2^beta3_B * (1-x4_option2)
+data_juice$V_Apple <- alpha0_A * x1_option1^beta0_A + alpha1_A * x2_option1^alpha2_A * x3_option1^alpha3_A * x4_option1 +  beta1_A * x2_option1^beta2_A * x3_option1^beta3_A * (1-x4_option1)
+data_juice$V_Berry <- alpha0_B * x1_option2^beta0_B + alpha1_B * x2_option2^alpha2_B * x3_option2^alpha3_B * x4_option2 +  beta1_B * x2_option2^beta2_B * x3_option2^beta3_B * (1-x4_option2) 
 data_juice$e_Apple <- rlogis(nrow(data_juice), location = 0, scale = 3)
 data_juice$e_Berry <- rlogis(nrow(data_juice), location = 0, scale = 3)
 data_juice$U_Apple <- data_juice$V_Apple + data_juice$e_Apple         # U_Apple = V_Apple + e_Apple
@@ -125,7 +126,7 @@ ggplot(data_juice_plot, aes(x = U_Apple, y = U_Berry, colour = Choice)) +
   geom_segment(aes(x = 0, y=0, xend=30, yend=30), colour="black")+
   theme_minimal()
 
-
+ggsave("output/Juice Choice.pdf", width = 8, height = 6)
 
 ############################## Nonlinear Marginal utility ##############################
 data_juice <- subset(data_juice, select = -c(V_Apple, e_Apple,U_Apple,V_Berry,e_Berry,U_Berry))
@@ -235,7 +236,7 @@ betaAppleOrganic <- attr(dfAppleOrganic(alpha0_A,
                                         beta3_A),"gradient") [,9]      # Marginal utility of Apple Organic 
 #0.6*x2_option1[1]^0.2*x3_option1[1]^0.4 - 0.5*x2_option1[1]^0.1*x3_option1[1]^0.2 # manual test 
 
-functionBerry <- formula (y ~ alpha0_B * x1_option2^beta0_B + alpha1_B * x2_option2^alpha2_B * x3_option2^alpha3_B * x4_option2 +  beta1_B * x2_option2^beta2_B * x3_option2^beta3_B * (1-x4_option2) )
+functionBerry <- formula (y ~ alpha0_B * x1_option2^beta0_B + alpha1_B * x2_option2^alpha2_B * x3_option2^alpha3_B * x4_option2 +  beta1_B * x2_option2^beta2_B * x3_option2^beta3_B * (1-x4_option2))
 dfBerryPrice <- deriv(functionBerry,c("alpha0_B",
                                       "x1_option2",
                                       "beta0_B",
@@ -406,23 +407,23 @@ ggplot(importance_df, aes(x = reorder(Feature, MeanDecreaseGini), y = MeanDecrea
   theme_minimal() +
   labs(title = "Feature Importance", x = "Feature", y = "Importance")
 
-ntree <- rf_model$ntree 
-for (i in 1:ntree) {
-  cat("Tree", i, ":\n")
-  print(getTree(rf_model, k = i, labelVar = TRUE))
-  cat("\n")
-}
+#ntree <- rf_model$ntree 
+#for (i in 1:ntree) {
+#  cat("Tree", i, ":\n")
+#  print(getTree(rf_model, k = i, labelVar = TRUE))
+#  cat("\n")
+#}
 
 # single decision tree
-install.packages("devtools")
-devtools::install_github("araastat/reprtree")
-library(reprtree)
-reprtree::plot.getTree(rf_model, k = 1)
-tree_1 <- getTree(rf_model, k = 1, labelVar = TRUE)
+# install.packages("devtools")
+# devtools::install_github("araastat/reprtree")
+# library(reprtree)
+# reprtree::plot.getTree(rf_model, k = 1)
+# tree_1 <- getTree(rf_model, k = 1, labelVar = TRUE)
 
-library(rpart)
-rpart_tree <- as.party(rpart(Choice ~ ., data = test_data))  
-plot(rpart_tree)  
+# library(rpart)
+# rpart_tree <- as.party(rpart(Choice ~ ., data = test_data))  
+# plot(rpart_tree)  
 
 
 # original RF
@@ -638,4 +639,36 @@ compare_mean <- data.frame(
 )
 print(compare_mean)
 
+# histogram of the true WTPs + draw a vertical line showing the MNL estimates of the mean in red and the true means in blue
+pdf("output/wtp_histograms.pdf", width = 8, height = 6)
+par(mfrow=c(2,3))
+hist(NOL_WTP_AppleCalorie, main="WTP for Apple Calorie", xlab="WTP")
+abline(v = MNL_WTP_AppleCalorie, col = "red")
+abline(v = mean_rf_WTP_AppleCalorie, col = "blue")
+hist(NOL_WTP_AppleSize, main="WTP for Apple Size", xlab="WTP")
+abline(v = MNL_WTP_AppleSize, col = "red")
+abline(v = mean_rf_WTP_AppleSize, col = "blue")
+hist(NOL_WTP_AppleOrganic, main="WTP for Apple Organic", xlab="WTP", xlim = c(4,15))
+abline(v = MNL_WTP_AppleOrganic, col = "red")
+abline(v = mean_rf_WTP_AppleOrganic, col = "blue")
+hist(NOL_WTP_BerryCalorie, main="WTP for Berry Calorie", xlab="WTP")
+abline(v = MNL_WTP_BerryCalorie, col = "red")
+abline(v = mean_rf_WTP_BerryCalorie, col = "blue")
+hist(NOL_WTP_BerrySize, main="WTP for Berry Size", xlab="WTP")
+abline(v = MNL_WTP_BerrySize, col = "red")
+abline(v = mean_rf_WTP_BerrySize, col = "blue")
+hist(NOL_WTP_BerryOrganic, main="WTP for Berry Organic", xlab="WTP",xlim = c(1,20))
+abline(v = MNL_WTP_BerryOrganic, col = "red")
+abline(v = mean_rf_WTP_BerryOrganic, col = "blue")
+dev.off()
 
+# boxplot
+pdf("output/wtp_boxplot.pdf", width = 8, height = 6)
+par(mfrow=c(2,3))
+boxplot(NOL_WTP_AppleCalorie, wtp_rf_AppleCalorie, names = c("True", "RF"), main = "AppleCalorie",ylim = c(-1,1), col = c("lightblue", "lightcoral"))
+boxplot(NOL_WTP_AppleSize, wtp_rf_AppleSize, names = c("True", "RF"), main = "AppleSize", ylim = c(-1,1), col = c("lightblue", "lightcoral"))
+boxplot(NOL_WTP_AppleOrganic, wtp_rf_AppleOrganic, names = c("True", "RF"), main = "AppleOrganic", ylim = c(-500,500),col = c("lightblue", "lightcoral"))
+boxplot(NOL_WTP_BerryCalorie, wtp_rf_BerryCalorie, names = c("True", "RF"), main = "BerryCalorie",ylim = c(-1,1), col = c("lightblue", "lightcoral"))
+boxplot(NOL_WTP_BerrySize, wtp_rf_BerrySize, names = c("True", "RF"), main = "BerrySize", ylim = c(-1,1), col = c("lightblue", "lightcoral"))
+boxplot(NOL_WTP_BerryOrganic, wtp_rf_BerryOrganic, names = c("True", "RF"), main = "BerryOrganic", ylim = c(-500,500),col = c("lightblue", "lightcoral"))
+dev.off()
