@@ -398,6 +398,7 @@ test_data <- data_juice[-train_indices, ]
 rf_model <- randomForest(as.factor(train_data$Choice) ~ ., importance = TRUE, data = train_data, ntree=5000)
 ntree <- rf_model$ntree 
 
+# importance plot
 importance <- importance(rf_model)
 importance_df <- as.data.frame(importance)
 importance_df$Feature <- rownames(importance_df)
@@ -406,6 +407,14 @@ ggplot(importance_df, aes(x = reorder(Feature, MeanDecreaseGini), y = MeanDecrea
   coord_flip() +
   theme_minimal() +
   labs(title = "Feature Importance", x = "Feature", y = "Importance")
+
+ggsave("output/importance.pdf", width = 8, height = 6)
+
+# prediction rate
+rf_predictions <- predict(rf_model, test_data)
+conf_matrix <- confusionMatrix(rf_predictions, test_data$Choice)
+print(conf_matrix)
+
 
 #ntree <- rf_model$ntree 
 #for (i in 1:ntree) {
